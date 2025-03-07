@@ -136,6 +136,8 @@ def format_prompt_execution_base(
         return prompt
     elif LanguageModelStyle == LMStyle.CodeLLaMaInstruct:
         return prompt
+    elif LanguageModelStyle == LMStyle.Watsonx:
+        return prompt
     elif LanguageModelStyle == LMStyle.MagiCoder:
         return prompt
     elif LanguageModelStyle == LMStyle.WizardCoder:

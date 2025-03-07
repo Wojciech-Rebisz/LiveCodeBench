@@ -42,6 +42,10 @@ def build_runner(args, model: LanguageModel):
         from lcb_runner.runner.fireworks_runner import FireWorksRunner
 
         return FireWorksRunner(args, model)
+    if model.model_style == LMStyle.Watsonx:
+        from lcb_runner.runner.watsonx_runner import WatsonxRunner
+
+        return WatsonxRunner(args, model)
     elif model.model_style in []:
         raise NotImplementedError(
             f"Runner for language model style {model.model_style} not implemented yet"

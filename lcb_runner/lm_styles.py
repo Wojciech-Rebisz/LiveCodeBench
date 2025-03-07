@@ -30,6 +30,8 @@ class LMStyle(Enum):
 
     DeepSeekR1 = "DeepSeekR1"
 
+    Watsonx = "Watsonx"
+
 
 @dataclass
 class LanguageModel:
@@ -646,6 +648,69 @@ LanguageModelList: list[LanguageModel] = [
         LMStyle.DeepSeekR1,
         datetime(2025, 1, 20),
         link="https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Llama-70B",
+    ),
+    LanguageModel(
+        "ibm/granite-3b-code-instruct",
+        "Granite-3B-Code-Instruct",
+        LMStyle.Watsonx,
+        datetime(2024, 5, 9),
+        link="https://www.ibm.com/docs/en/watsonx/w-and-w/2.0.x?topic=models-granite-3b-code-instruct-model-card",
+    ),
+    LanguageModel(
+        "ibm/granite-8b-code-instruct",
+        "Granite-8B-Code-Instruct",
+        LMStyle.Watsonx,
+        datetime(2024, 7, 18),
+        link="https://www.ibm.com/docs/en/watsonx/w-and-w/2.0.x?topic=models-granite-8b-code-instruct-model-card",
+    ),
+    LanguageModel(
+        "ibm/granite-20b-code-instruct",
+        "Granite-20B-Code-Instruct",
+        LMStyle.Watsonx,
+        datetime(2024, 5, 6),
+        link="https://www.ibm.com/docs/en/watsonx/w-and-w/2.0.x?topic=models-granite-20b-code-instruct-model-card",
+    ),
+    LanguageModel(
+        "ibm/granite-34b-code-instruct",
+        "Granite-34B-Code-Instruct",
+        LMStyle.Watsonx,
+        datetime(2024, 5, 6),
+        link="https://www.ibm.com/docs/en/watsonx/w-and-w/2.0.x?topic=models-granite-34b-code-instruct-model-card",
+    ),
+    LanguageModel(
+        "mistralai/mixtral-8x7b-instruct-v01",
+        "Mixtral-8x7B-Instruct-v0.1",
+        LMStyle.Watsonx,
+        datetime(2023, 1, 1),
+        link="https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1",
+    ),
+    LanguageModel(
+        "ibm/granite-3-2b-instruct",
+        "Granite-3-2B-Code-Instruct",
+        LMStyle.Watsonx,
+        datetime(2024, 12, 18),
+        link="https://huggingface.co/ibm-granite/granite-3.1-2b-instruct",
+    ),
+    LanguageModel(
+        "ibm/granite-3-8b-instruct",
+        "Granite-3-8B-Code-Instruct",
+        LMStyle.Watsonx,
+        datetime(2024, 12, 18),
+        link="https://huggingface.co/ibm-granite/granite-3.1-8b-instruct",
+    ),
+    LanguageModel(
+        "meta-llama/llama-3-2-3b-instruct",
+        "LLama3.2-3b-Ins",
+        LMStyle.Watsonx,
+        datetime(2024, 7, 25),
+        link="https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct",
+    ),
+    LanguageModel(
+        "meta-llama/llama-3-1-8b-instruct",
+        "LLama3.1-8b-Ins",
+        LMStyle.Watsonx,
+        datetime(2024, 7, 23),
+        link="https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct",
     ),
 ]
 
