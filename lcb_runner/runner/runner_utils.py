@@ -42,7 +42,15 @@ def build_runner(args, model: LanguageModel):
         from lcb_runner.runner.fireworks_runner import FireWorksRunner
 
         return FireWorksRunner(args, model)
-    if model.model_style == LMStyle.Watsonx:
+    if model.model_style == LMStyle.WxGranite:
+        from lcb_runner.runner.watsonx_runner import WatsonxRunner
+
+        return WatsonxRunner(args, model)
+    if model.model_style == LMStyle.WxLLaMa:
+        from lcb_runner.runner.watsonx_runner import WatsonxRunner
+
+        return WatsonxRunner(args, model)
+    if model.model_style == LMStyle.WxMistral:
         from lcb_runner.runner.watsonx_runner import WatsonxRunner
 
         return WatsonxRunner(args, model)

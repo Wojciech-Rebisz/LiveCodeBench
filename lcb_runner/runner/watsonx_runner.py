@@ -27,7 +27,7 @@ class WatsonxRunner(BaseRunner):
             "temperature": args.temperature,
             "max_new_tokens": args.max_tokens,
             "top_p": args.top_p,
-            "random_seed": 10,
+            "random_seed": args.seed,
         }
 
         self.model_inference = ModelInference(

@@ -131,6 +131,7 @@ def get_args():
         default=None,
         help="End date for the contest to filter the evaluation file (format - YYYY-MM-DD)",
     )
+    parser.add_argument("--seed", type=int, default=10, help="Random seed")
 
     args = parser.parse_args()
 
