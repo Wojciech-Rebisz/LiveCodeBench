@@ -38,22 +38,15 @@ def build_runner(args, model: LanguageModel):
         from lcb_runner.runner.deepseek_runner import DeepSeekRunner
 
         return DeepSeekRunner(args, model)
+    if model.model_style in [LMStyle.WxGranite, LMStyle.WxLLaMa, LMStyle.WxMistral]:
+        from lcb_runner.runner.watsonx_runner import WatsonxRunner
+
+        return WatsonxRunner(args, model)
+
     if "/fireworks/" in model.model_name:
         from lcb_runner.runner.fireworks_runner import FireWorksRunner
 
         return FireWorksRunner(args, model)
-    if model.model_style == LMStyle.WxGranite:
-        from lcb_runner.runner.watsonx_runner import WatsonxRunner
-
-        return WatsonxRunner(args, model)
-    if model.model_style == LMStyle.WxLLaMa:
-        from lcb_runner.runner.watsonx_runner import WatsonxRunner
-
-        return WatsonxRunner(args, model)
-    if model.model_style == LMStyle.WxMistral:
-        from lcb_runner.runner.watsonx_runner import WatsonxRunner
-
-        return WatsonxRunner(args, model)
     elif model.model_style in []:
         raise NotImplementedError(
             f"Runner for language model style {model.model_style} not implemented yet"
