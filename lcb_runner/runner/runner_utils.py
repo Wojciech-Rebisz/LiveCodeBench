@@ -41,6 +41,12 @@ def build_runner(args, model: LanguageModel):
     if model.model_style in [LMStyle.WxGranite, LMStyle.WxLLaMa, LMStyle.WxMistral]:
         from lcb_runner.runner.watsonx_runner import WatsonxRunner
 
+        if args.env != "wx":
+            raise Exception(
+                f"{model.model_name} is not supported in the {args.env} environment. ",
+                "Only `wx` (WatsonX environment) is supported.",
+            )
+
         return WatsonxRunner(args, model)
 
     if "/fireworks/" in model.model_name:

@@ -132,6 +132,7 @@ def get_args():
         help="End date for the contest to filter the evaluation file (format - YYYY-MM-DD)",
     )
     parser.add_argument("--seed", type=int, default=10, help="Random seed")
+    parser.add_argument("--env", type=str, default="hf", help="Environment of model")
 
     args = parser.parse_args()
 
