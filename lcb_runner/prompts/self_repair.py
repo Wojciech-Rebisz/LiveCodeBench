@@ -46,14 +46,17 @@ def get_check_prompt(question: str, result, metadata):
         message = f"The above code is incorrect and got the following compilation error.\n{metadata['error']}"
     elif metadata["error_code"] == -2:
         # wrong answer
-        message = f"The above code is incorrect and got a wrong answer.\nInput: {metadata['inputs']}\nGenerated Output: {metadata['output']}\nExpected: {metadata['expected']}"
+        message = f"The above code is incorrect and got a wrong answer.\nInput: {metadata.get('inputs')}\nGenerated Output: {metadata.get('output')}\nExpected: {metadata.get('expected')}"
     elif metadata["error_code"] == -3:
         # time limit exceeded
-        message = f"The above code is incorrect and got time limit exceeded.\n{metadata['error']}\nInput: {metadata['inputs']}\nExpected: {metadata['expected']}"
+        message = f"The above code is incorrect and got time limit exceeded.\n{metadata.get('inputs')}\nInput: {metadata.get('inputs')}\nExpected: {metadata.get('expected')}"
         pass
     elif metadata["error_code"] == -4:
         # runtime error
-        message = f"The above code is incorrect and got a runtime error.\nInput: {metadata['inputs']}\nExpected: {metadata['expected']}\n{metadata['error']}"
+        message = f"The above code is incorrect and got a runtime error.\nInput: {metadata.get('inputs')}\nExpected: {metadata.get('expected')}\n{metadata.get('error')}"
+    elif metadata["error_code"] == -5:
+        # runtime error
+        message = f"The above code is incorrect and got a index error.\nInput: {metadata.get('inputs')}\nExpected: {metadata.get('expected')}\n{metadata.get('error')}"
     else:
         raise NotImplementedError(
             f"metadata['error_code'] = {metadata['error_code']} not implemented || {metadata=}"
@@ -140,6 +143,7 @@ def get_phind_question_template_answer(question: str, code, result, metadata):
     prompt += f"### Answer: (use the provided format with backticks)\n\n"
     return prompt
 
+
 def get_qwen_question_template_answer(question: str, code, result, metadata):
     from transformers import AutoTokenizer
 
@@ -171,6 +175,7 @@ def get_qwen_question_template_answer(question: str, code, result, metadata):
         padding=False,
     )
     return prompt
+
 
 def format_prompt_self_repair(
     question: str, LanguageModelStyle: LMStyle, code, result, metadata
@@ -242,7 +247,9 @@ def format_prompt_self_repair(
         chat_messages += [
             {
                 "role": "user",
-                "content": get_generic_question_template_answer(question, code, result, metadata),
+                "content": get_generic_question_template_answer(
+                    question, code, result, metadata
+                ),
             },
         ]
         return chat_messages
@@ -258,6 +265,15 @@ def format_prompt_self_repair(
         return prompt
     elif LanguageModelStyle == LMStyle.CodeLLaMaInstruct:
         prompt = f"[INST] <<SYS>>\n{PromptConstants.SYSTEM_MESSAGE_GENERIC}\n<</SYS>>\n\n{get_cllama_question_template_answer(question, code, result,metadata)}\n[/INST]"
+        return prompt
+    elif LanguageModelStyle == LMStyle.WxGranite:
+        prompt = f"{PromptConstants.SYSTEM_MESSAGE_GENERIC}\n{get_generic_question_template_answer(question, code, result,metadata)}"
+        return prompt
+    elif LanguageModelStyle == LMStyle.WxLLaMa:
+        prompt = f"{PromptConstants.SYSTEM_MESSAGE_GENERIC}\n{get_generic_question_template_answer(question, code, result,metadata)}"
+        return prompt
+    elif LanguageModelStyle == LMStyle.WxMistral:
+        prompt = f"{PromptConstants.SYSTEM_MESSAGE_GENERIC}\n{get_generic_question_template_answer(question, code, result,metadata)}"
         return prompt
     elif LanguageModelStyle == LMStyle.MagiCoder:
         prompt = f"{PromptConstants.SYSTEM_MESSAGE_MAGIC}\n{get_magicoder_question_template_answer(question, code, result,metadata)}"
@@ -287,7 +303,9 @@ def format_prompt_self_repair(
         from transformers import AutoTokenizer
 
         tokenizer = AutoTokenizer.from_pretrained(
-            "abacusai/Dracarys-Llama-3.1-70B-Instruct", padding_side="right", use_fast=False
+            "abacusai/Dracarys-Llama-3.1-70B-Instruct",
+            padding_side="right",
+            use_fast=False,
         )
         return tokenizer.apply_chat_template(
             chat_messages,
@@ -298,7 +316,9 @@ def format_prompt_self_repair(
         )
     if LanguageModelStyle == LMStyle.Eurusx:
         prompt = "[INST] Write Python code to solve the task:\n"
-        prompt += f"{get_wizard_question_template_answer(question, code, result,metadata)}"
+        prompt += (
+            f"{get_wizard_question_template_answer(question, code, result,metadata)}"
+        )
         prompt += "[/INST]"
         return prompt
     else:

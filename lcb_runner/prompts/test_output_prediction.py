@@ -132,7 +132,10 @@ def get_phind_question_template_answer(
     prompt += f"\n\n### Assistant"
     return prompt
 
-def get_qwen_question_template_answer(question: TestOutputPredictionProblem, testcase_input: str):
+
+def get_qwen_question_template_answer(
+    question: TestOutputPredictionProblem, testcase_input: str
+):
     from transformers import AutoTokenizer
 
     tokenizer = AutoTokenizer.from_pretrained(
@@ -155,6 +158,7 @@ def get_qwen_question_template_answer(question: TestOutputPredictionProblem, tes
         padding=False,
     )
     return prompt
+
 
 def format_prompt_test_output(
     question: TestOutputPredictionProblem, LanguageModelStyle: LMStyle
@@ -243,6 +247,24 @@ def format_prompt_test_output(
             f"{get_cllama_question_template_answer(question, testcase_input)}\n[/INST]"
         )
         return prompt
+    elif LanguageModelStyle == LMStyle.WxGranite:
+        prompt = f"{PromptConstants.SYSTEM_MESSAGE_CHAT_GENERIC}\n"
+        prompt += (
+            f"{get_generic_question_template_test_completion(question, testcase_input)}"
+        )
+        return prompt
+    elif LanguageModelStyle == LMStyle.WxLLaMa:
+        prompt = f"{PromptConstants.SYSTEM_MESSAGE_CHAT_GENERIC}\n"
+        prompt += (
+            f"{get_generic_question_template_test_completion(question, testcase_input)}"
+        )
+        return prompt
+    elif LanguageModelStyle == LMStyle.WxMistral:
+        prompt = f"{PromptConstants.SYSTEM_MESSAGE_CHAT_GENERIC}\n"
+        prompt += (
+            f"{get_generic_question_template_test_completion(question, testcase_input)}"
+        )
+        return prompt
     elif LanguageModelStyle == LMStyle.MagiCoder:
         prompt = f"{PromptConstants.SYSTEM_MESSAGE_CHAT_GENERIC}\n"
         prompt += f"{get_magicoder_question_template_answer(question, testcase_input)}"
@@ -273,9 +295,7 @@ def format_prompt_test_output(
             },
         ]
         return chat_messages
-    elif (
-        LanguageModelStyle == LMStyle.DracarysQwen
-    ):
+    elif LanguageModelStyle == LMStyle.DracarysQwen:
         prompt = f"{get_qwen_question_template_answer(question, testcase_input)}"
         return prompt
     elif LanguageModelStyle == LMStyle.DracarysLlama:
@@ -296,7 +316,9 @@ def format_prompt_test_output(
         from transformers import AutoTokenizer
 
         tokenizer = AutoTokenizer.from_pretrained(
-            "abacusai/Dracarys-Llama-3.1-70B-Instruct", padding_side="right", use_fast=False
+            "abacusai/Dracarys-Llama-3.1-70B-Instruct",
+            padding_side="right",
+            use_fast=False,
         )
         return tokenizer.apply_chat_template(
             chat_messages,

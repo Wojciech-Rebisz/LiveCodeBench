@@ -1,14 +1,27 @@
 from lcb_runner.lm_styles import LMStyle
+import re
 
 
 def extract_code(model_output: str, lmstyle: LMStyle):
     outputlines = model_output.split("\n")
+
     if lmstyle == LMStyle.CodeLLaMaInstruct:
         indexlines = [i for i, line in enumerate(outputlines) if "PYTHON]" in line]
         if len(indexlines) < 2:
             indexlines = [i for i, line in enumerate(outputlines) if "```" in line]
     elif lmstyle == LMStyle.GenericBase:
         return model_output.strip()
+    elif lmstyle in [LMStyle.WxLLaMa, LMStyle.WxGranite, LMStyle.WxMistral]:
+
+        matches = re.findall(r"```python\s*\n(.*?)```", model_output, re.DOTALL)
+        if not matches:
+            matches = re.findall(r"```\s*\n(.*?)```", model_output, re.DOTALL)
+
+        for match in matches:
+            stripped_string = match.strip()
+            if stripped_string:
+                return stripped_string
+        return ""
     else:
         indexlines = [i for i, line in enumerate(outputlines) if "```" in line]
         if len(indexlines) < 2:

@@ -3,9 +3,9 @@ import json
 
 from lcb_runner.runner.parser import get_args
 from lcb_runner.utils.scenarios import Scenario
-from lcb_runner.lm_styles import LanguageModelStore
+from lcb_runner.lm_styles import LanguageModelStore, LMStyle
 from lcb_runner.runner.runner_utils import build_runner
-from lcb_runner.utils.path_utils import get_output_path
+from lcb_runner.utils.path_utils import get_output_path, save_summary_csv
 from lcb_runner.evaluation import extract_instance_results
 from lcb_runner.runner.scenario_router import (
     build_prompt_benchmark,
@@ -222,6 +222,13 @@ def main():
 
         with open(eval_all_file, "w") as f:
             json.dump(save_eval_results, f, indent=4)
+
+        if model.model_style in [LMStyle.WxGranite, LMStyle.WxLLaMa, LMStyle.WxMistral]:
+            params_file = output_path.replace(".json", "_params.csv")
+
+            save_summary_csv(
+                output_path=params_file, runner=runner, args=args, metrics=metrics
+            )
 
 
 if __name__ == "__main__":

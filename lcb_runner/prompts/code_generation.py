@@ -30,6 +30,8 @@ class PromptConstants:
         "The reasoning process and answer are enclosed within <think> </think> and <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>.<｜User｜>"
     )
 
+    SYSTEM_MESSAGE_GRANITE = """You are an intelligent AI programming assistant, utilizing a Granite code language model developed by IBM."""
+
     FORMATTING_MESSAGE_WITH_STARTER_CODE = "You will use the following starter code to write the solution to the problem and enclose your code within delimiters."
 
     FORMATTING_WITHOUT_STARTER_CODE = "Read the inputs from stdin solve the problem and write the answer to stdout (do not directly test on the sample inputs). Enclose your code within delimiters as follows. Ensure that when the python program runs, it reads the inputs, runs the algorithm and writes output to STDOUT."
@@ -44,8 +46,7 @@ def get_generic_question_template_answer(question: CodeGenerationProblem):
         prompt += f"```python\n{question.starter_code}\n```\n\n"
     else:
         prompt += f"### Format: {PromptConstants.FORMATTING_WITHOUT_STARTER_CODE}\n"
-        prompt += "```python\n# YOUR CODE HERE\n```\n\n"
-    prompt += f"### Answer: (use the provided format with backticks)\n\n"
+    prompt += "### Answer:\nRespond ONLY with the final solution code inside a single code block like this:\n```python\n# YOUR CODE HERE\n```\n\n"
     return prompt
 
 
@@ -148,6 +149,20 @@ def get_deepseek_r1_question_template_answer(question: CodeGenerationProblem):
         prompt += f"{PromptConstants.FORMATTING_WITHOUT_STARTER_CODE}\n"
         prompt += f"```python\n# YOUR CODE HERE\n```\n\n"
     prompt += f"<｜Assistant｜>"
+    return prompt
+
+
+def get_granite_question_template_answer(question: CodeGenerationProblem):
+    prompt = f"### Question:\n{question.question_content}\n\n"
+    if question.starter_code:
+        prompt += (
+            f"### Format: {PromptConstants.FORMATTING_MESSAGE_WITH_STARTER_CODE}\n"
+        )
+        prompt += f"```python\n{question.starter_code}\n```\n\n"
+    else:
+        prompt += f"### Format: {PromptConstants.FORMATTING_WITHOUT_STARTER_CODE}\n"
+        prompt += "```python\n# YOUR CODE HERE\n```\n\n"
+    prompt += f"### Answer: (use the provided format with backticks)\n\n"
     return prompt
 
 
@@ -312,6 +327,21 @@ def format_prompt_generation(
 
     if LanguageModelStyle == LMStyle.GenericBase:
         prompt = get_base_model_question_template_answer(question)
+        return prompt
+
+    if LanguageModelStyle == LMStyle.WxGranite:
+        prompt = f"{PromptConstants.SYSTEM_MESSAGE_GRANITE}\n\n"
+        prompt += f"{get_granite_question_template_answer(question)}"
+        return prompt
+
+    if LanguageModelStyle == LMStyle.WxLLaMa:
+        prompt = f"{PromptConstants.SYSTEM_MESSAGE_GENERIC}\n\n"
+        prompt += f"{get_generic_question_template_answer(question)}"
+        return prompt
+
+    if LanguageModelStyle == LMStyle.WxMistral:
+        prompt = f"{PromptConstants.SYSTEM_MESSAGE_GENERIC}\n\n"
+        prompt += f"{get_generic_question_template_answer(question)}"
         return prompt
 
     raise NotImplementedError(
