@@ -1,8 +1,11 @@
 import numpy as np
 from concurrent.futures import ProcessPoolExecutor
-import tqdm
+import os
+import requests
+import json
 
 from lcb_runner.evaluation.utils_execute import BASE_IMPORTS, check_correctness
+
 
 def evaluate_score(args) -> list[bool]:
     gs, (c, i, o) = args
@@ -11,6 +14,10 @@ def evaluate_score(args) -> list[bool]:
     for g in gs:
         if i in g:
             pass
+        elif url := os.getenv("WX_URL_ADDR"):
+            code_to_execute = f"{BASE_IMPORTS}\n{c}\nassert {o} == {g}\n"
+            status = send_code_exec_request(code=code_to_execute, url=url)
+            execution_results.append(True if status["exit_code"] == 0 else False)
         else:
             code_to_execute = f"{BASE_IMPORTS}\n{c}\nassert {o} == {g}"
             execution_results.append(check_correctness(code_to_execute, 3))
@@ -18,9 +25,12 @@ def evaluate_score(args) -> list[bool]:
         execution_results = [False] * len(gs)
     return execution_results
 
+
 def pass_at_k(n, c, k):
-    if n - c < k: return 1.0
+    if n - c < k:
+        return 1.0
     return 1.0 - np.prod(1.0 - k / np.arange(n - c + 1, n + 1))
+
 
 def code_execution_metrics(
     samples,
@@ -54,3 +64,28 @@ def code_execution_metrics(
             r_new.append([_r])
         results[i] = r_new
     return [metrics, results]
+
+
+def send_code_exec_request(code: str, url: str) -> dict:
+    headers = {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+    }
+
+    response = requests.post(
+        url=url,
+        headers=headers,
+        json={
+            "lang": "python",
+            "code": code,
+        },
+    )
+
+    if not response.ok or response.status_code >= 300:
+        raise Exception(f"Problem with the server, please check if url is valid: {url}")
+
+    status = json.loads(response.content.decode("utf-8"))
+    if isinstance(status, list):
+        status = status[0]
+
+    return status

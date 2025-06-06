@@ -701,6 +701,13 @@ LanguageModelList: list[LanguageModel] = [
         link="https://huggingface.co/ibm-granite/granite-3.1-8b-instruct",
     ),
     LanguageModel(
+        "ibm/granite-3-3-8b-instruct",
+        "Granite-3.3-8B-Instruct",
+        LMStyle.WxGranite,
+        datetime(2025, 4, 16),
+        link="https://huggingface.co/ibm-granite/granite-3.3-8b-instruct",
+    ),
+    LanguageModel(
         "meta-llama/llama-3-2-3b-instruct",
         "LLama3.2-3b-Ins",
         LMStyle.WxLLaMa,
@@ -713,6 +720,27 @@ LanguageModelList: list[LanguageModel] = [
         LMStyle.WxLLaMa,
         datetime(2024, 7, 23),
         link="https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct",
+    ),
+    LanguageModel(
+        "meta-llama/llama-4-scout-17b-16e-instruct",
+        "Llama-4-Scout-17B-16E-Instruct",
+        LMStyle.WxLLaMa,
+        datetime(2025, 4, 7),
+        link="https://huggingface.co/meta-llama/Llama-4-Scout-17B-16E-Instruct",
+    ),
+    LanguageModel(
+        "meta-llama/llama-4-maverick-17b-128e-instruct-fp8",
+        "Llama-4-Maverick-17B-128E-Instruct-FP8",
+        LMStyle.WxLLaMa,
+        datetime(2025, 4, 7),
+        link="https://huggingface.co/meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8",
+    ),
+    LanguageModel(
+        "mistralai/mistral-medium-2505",
+        "Mistral-medium-2505",
+        LMStyle.WxMistral,
+        datetime(2025, 5, 7),
+        link="https://mistral.ai/news/mistral-medium-3",
     ),
 ]
 

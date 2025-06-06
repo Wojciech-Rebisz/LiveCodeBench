@@ -1,8 +1,10 @@
 import ast
+import os
 import json
 import sys
 import faulthandler
 import platform
+import requests
 
 # used for debugging to time steps
 from datetime import datetime
@@ -431,6 +433,21 @@ def run_test(sample, test=None, debug=False, timeout=6):
             print(f"loading test code = {datetime.now().time()}")
 
         if which_type == CODE_TYPE.call_based:
+            if url := os.getenv("WX_URL_ADDR"):
+                try:
+                    status = send_code_exec_request(
+                        code=test,
+                        url=url,
+                        in_outs=in_outs,
+                        fn_name=method_name,
+                        timeout=timeout * 2,
+                    )
+                    return status["all_results"], status["metadata"]
+                except Exception as e:
+                    return [-4], {
+                        "error_code": -4,
+                        "error_message": f"Error during testing: {e}",
+                    }
             signal.alarm(timeout)
             try:
                 results, metadata = grade_call_based(
@@ -451,7 +468,18 @@ def run_test(sample, test=None, debug=False, timeout=6):
         elif which_type == CODE_TYPE.standard_input:
             # sol
             # if code has if __name__ == "__main__": then remove it
+            if url := os.getenv("WX_URL_ADDR"):
+                try:
+                    status = send_code_exec_request(
+                        code=test, url=url, in_outs=in_outs, timeout=timeout * 2
+                    )
 
+                    return status["all_results"], status["metadata"]
+                except Exception as e:
+                    return [-4], {
+                        "error_code": -4,
+                        "error_message": f"Error during testing: {e}",
+                    }
             signal.alarm(timeout)
             try:
                 results, metadata = grade_stdio(
@@ -554,3 +582,38 @@ def reliability_guard(maximum_memory_bytes=None):
     sys.modules["resource"] = None
     sys.modules["psutil"] = None
     sys.modules["tkinter"] = None
+
+
+def send_code_exec_request(
+    code: str, url: str, in_outs: dict, fn_name: str = None, timeout: int = 10
+) -> dict:
+    headers = {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+    }
+    response = requests.get(
+        url=url.replace("/evaluate_code", "/health"),
+    )
+    if response.status_code != 200:
+        time.sleep(10)
+
+    response = requests.post(
+        url=url,
+        headers=headers,
+        json={
+            "lang": "python",
+            "code": code,
+            "user_data": in_outs,
+            "fn_name": fn_name,
+        },
+        timeout=timeout,
+    )
+
+    if not response.ok or response.status_code >= 300:
+        raise Exception(f"Problem with the response from server, check url: {url}")
+
+    status = json.loads(response.content.decode("utf-8"))
+    if isinstance(status, list):
+        status = status[0]
+
+    return status
